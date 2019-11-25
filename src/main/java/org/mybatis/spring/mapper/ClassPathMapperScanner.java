@@ -160,11 +160,13 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    // 通过父类的扫描，获取所有复合条件的BeanDefinitionHolder对象
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
       logger.warn("No MyBatis mapper was found in '" + Arrays.toString(basePackages) + "' package. Please check your configuration.");
     } else {
+      // 处理扫描得到的BeanDefinitionHolder集合，将集合中的每一个mapper接口转换成MapperFactory
       processBeanDefinitions(beanDefinitions);
     }
 

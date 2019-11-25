@@ -93,7 +93,7 @@ import org.springframework.util.StringUtils;
  */
 public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
 
-  private String basePackage;
+  private String basePackage;// 用于指定要扫描的包
 
   private boolean addToConfig = true;
 
@@ -105,11 +105,11 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
 
   private String sqlSessionTemplateBeanName;
 
-  private Class<? extends Annotation> annotationClass;
+  private Class<? extends Annotation> annotationClass;// mapper接口上有指定的annotation才会被扫描
 
-  private Class<?> markerInterface;
+  private Class<?> markerInterface;// mapper接口继承与指定的接口才会被扫描
 
-  private ApplicationContext applicationContext;
+  private ApplicationContext applicationContext;// 容器上下文
 
   private String beanName;
 
@@ -299,10 +299,10 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
    */
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
-    if (this.processPropertyPlaceHolders) {
+    if (this.processPropertyPlaceHolders) {// 占位符处理
       processPropertyPlaceHolders();
     }
-
+    // 实例化ClassPathMapperScanner，并对scanner相关属性进行处理
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
@@ -313,7 +313,8 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
     scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
     scanner.setResourceLoader(this.applicationContext);
     scanner.setBeanNameGenerator(this.nameGenerator);
-    scanner.registerFilters();
+    scanner.registerFilters();// 根据上述配置，生成过滤器，只扫描各条件的class
+    // 扫描指定的包以及其子包
     scanner.scan(StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
   }
 
