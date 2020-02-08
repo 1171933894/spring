@@ -491,6 +491,7 @@ public class SqlSessionFactoryBean
     final Configuration targetConfiguration;
 
     XMLConfigBuilder xmlConfigBuilder = null;
+    // 如果Configuration对象存在，则使用指定的Configuration对象并对其进行配置
     if (this.configuration != null) {
       targetConfiguration = this.configuration;
       if (targetConfiguration.getVariables() == null) {
@@ -499,25 +500,32 @@ public class SqlSessionFactoryBean
         targetConfiguration.getVariables().putAll(this.configurationProperties);
       }
     } else if (this.configLocation != null) {
+      // 创建XMLConfigBuilder对象，读取指定的配置文件
       xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null, this.configurationProperties);
       targetConfiguration = xmlConfigBuilder.getConfiguration();
     } else {
+      // 直接创建Configuration对象并进行配置
       LOGGER.debug(
           () -> "Property 'configuration' or 'configLocation' not specified, using default MyBatis Configuration");
       targetConfiguration = new Configuration();
       Optional.ofNullable(this.configurationProperties).ifPresent(targetConfiguration::setVariables);
     }
 
+    // 配置objectFactory
     Optional.ofNullable(this.objectFactory).ifPresent(targetConfiguration::setObjectFactory);
+    // 配置objectWrapperFactory
     Optional.ofNullable(this.objectWrapperFactory).ifPresent(targetConfiguration::setObjectWrapperFactory);
+    // 配置vfsImpl
     Optional.ofNullable(this.vfs).ifPresent(targetConfiguration::setVfsImpl);
 
+    // 扫描typeAliasesPackage指定的包，并为其中的类注册别名
     if (hasLength(this.typeAliasesPackage)) {
       scanClasses(this.typeAliasesPackage, this.typeAliasesSuperType).stream()
           .filter(clazz -> !clazz.isAnonymousClass()).filter(clazz -> !clazz.isInterface())
           .filter(clazz -> !clazz.isMemberClass()).forEach(targetConfiguration.getTypeAliasRegistry()::registerAlias);
     }
 
+    // 为typeAliases集合中指定的类注册别名
     if (!isEmpty(this.typeAliases)) {
       Stream.of(this.typeAliases).forEach(typeAlias -> {
         targetConfiguration.getTypeAliasRegistry().registerAlias(typeAlias);
@@ -525,6 +533,7 @@ public class SqlSessionFactoryBean
       });
     }
 
+    // 注册plugins结合中指定的插件
     if (!isEmpty(this.plugins)) {
       Stream.of(this.plugins).forEach(plugin -> {
         targetConfiguration.addInterceptor(plugin);
@@ -532,12 +541,14 @@ public class SqlSessionFactoryBean
       });
     }
 
+    // 扫描typeHandlersPackage指定的包，并注册其中的TypeHandler
     if (hasLength(this.typeHandlersPackage)) {
       scanClasses(this.typeHandlersPackage, TypeHandler.class).stream().filter(clazz -> !clazz.isAnonymousClass())
           .filter(clazz -> !clazz.isInterface()).filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
           .forEach(targetConfiguration.getTypeHandlerRegistry()::register);
     }
 
+    // 注册将typeHandlers集合中指定的TypeHandler
     if (!isEmpty(this.typeHandlers)) {
       Stream.of(this.typeHandlers).forEach(typeHandler -> {
         targetConfiguration.getTypeHandlerRegistry().register(typeHandler);
@@ -545,6 +556,7 @@ public class SqlSessionFactoryBean
       });
     }
 
+    // 配置languageDriver
     if (!isEmpty(this.scriptingLanguageDrivers)) {
       Stream.of(this.scriptingLanguageDrivers).forEach(languageDriver -> {
         targetConfiguration.getLanguageRegistry().register(languageDriver);
@@ -554,6 +566,7 @@ public class SqlSessionFactoryBean
     Optional.ofNullable(this.defaultScriptingLanguageDriver)
         .ifPresent(targetConfiguration::setDefaultScriptingLanguage);
 
+    // 配置databaseIdProvider
     if (this.databaseIdProvider != null) {// fix #64 set databaseId before parse mapper xmls
       try {
         targetConfiguration.setDatabaseId(this.databaseIdProvider.getDatabaseId(this.dataSource));
@@ -562,10 +575,12 @@ public class SqlSessionFactoryBean
       }
     }
 
+    // 配置缓存
     Optional.ofNullable(this.cache).ifPresent(targetConfiguration::addCache);
 
     if (xmlConfigBuilder != null) {
       try {
+        // 调用XMLConfigBuilder.parse()方法，解析配置文件
         xmlConfigBuilder.parse();
         LOGGER.debug(() -> "Parsed configuration file: '" + this.configLocation + "'");
       } catch (Exception ex) {
@@ -575,6 +590,7 @@ public class SqlSessionFactoryBean
       }
     }
 
+    // 如果未配置transactionFactory，则默认使用SpringManagedTransactionFactory
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
         this.dataSource));
@@ -583,6 +599,8 @@ public class SqlSessionFactoryBean
       if (this.mapperLocations.length == 0) {
         LOGGER.warn(() -> "Property 'mapperLocations' was specified but matching resources are not found.");
       } else {
+        // 根据mapperLocations配置，处理映射文件以及相应的Mapper接口，eg：
+        // <property name="configLocation" value="classpath:SqlMapConfig.xml" />
         for (Resource mapperLocation : this.mapperLocations) {
           if (mapperLocation == null) {
             continue;
@@ -603,6 +621,7 @@ public class SqlSessionFactoryBean
       LOGGER.debug(() -> "Property 'mapperLocations' was not specified.");
     }
 
+    // 最终调用SqlSessionFactoryBuilder.build()方法，创建sqlSessionFactory对象并返回
     return this.sqlSessionFactoryBuilder.build(targetConfiguration);
   }
 
