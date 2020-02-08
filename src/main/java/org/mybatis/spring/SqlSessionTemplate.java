@@ -64,6 +64,10 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
  * }
  * </pre>
  *
+ * 用来代替MyBatis中的DefaultSqlSession的功能，所以可以通过
+ * SqlSessionTemplate对象完成指定的数据库操作。线程安全，可以
+ * 在DAO之间共享使用，其底层封装了Spring管理的SqlSession对象。
+ *
  * @author Putthiphong Boonphong
  * @author Hunter Presnall
  * @author Eduardo Macarron
@@ -73,12 +77,16 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
  */
 public class SqlSessionTemplate implements SqlSession, DisposableBean {
 
+  // 用于创建SqlSession对象的工厂类
   private final SqlSessionFactory sqlSessionFactory;
 
+  // SqlSession底层使用的ExecutorType类型
   private final ExecutorType executorType;
 
+  // 通过JDK动态代理生成的代理对象
   private final SqlSession sqlSessionProxy;
 
+  // Spring中的异常转换器
   private final PersistenceExceptionTranslator exceptionTranslator;
 
   /**
@@ -127,6 +135,7 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
     this.sqlSessionFactory = sqlSessionFactory;
     this.executorType = executorType;
     this.exceptionTranslator = exceptionTranslator;
+    // 通过JDK动态代理的方式，创建SqlSession类型的代理对象，并初始化SqlSessionProxy对象
     this.sqlSessionProxy = (SqlSession) newProxyInstance(SqlSessionFactory.class.getClassLoader(),
         new Class[] { SqlSession.class }, new SqlSessionInterceptor());
   }
@@ -389,7 +398,7 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
 
   /**
    * Allow gently dispose bean:
-   * 
+   *
    * <pre>
    * {@code
    *
@@ -420,16 +429,18 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
   private class SqlSessionInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      // 通过静态方法SqlSessionUtils.getSession()获取SqlSession对象
       SqlSession sqlSession = getSqlSession(SqlSessionTemplate.this.sqlSessionFactory,
           SqlSessionTemplate.this.executorType, SqlSessionTemplate.this.exceptionTranslator);
       try {
-        Object result = method.invoke(sqlSession, args);
+        Object result = method.invoke(sqlSession, args);// 调用SqlSession对象的相应方法
+        // 检测事务是否由Spring进行管理，并据此决定是否提交事务
         if (!isSqlSessionTransactional(sqlSession, SqlSessionTemplate.this.sqlSessionFactory)) {
           // force commit even on non-dirty sessions because some databases require
           // a commit/rollback before calling close()
           sqlSession.commit(true);
         }
-        return result;
+        return result;// 返回数据库操作的相应结果
       } catch (Throwable t) {
         Throwable unwrapped = unwrapThrowable(t);
         if (SqlSessionTemplate.this.exceptionTranslator != null && unwrapped instanceof PersistenceException) {

@@ -94,16 +94,20 @@ public final class SqlSessionUtils {
     notNull(sessionFactory, NO_SQL_SESSION_FACTORY_SPECIFIED);
     notNull(executorType, NO_EXECUTOR_TYPE_SPECIFIED);
 
+    // 从Spring事务管理器中获取SqlSessionHolder，其中封装了SqlSession对象
     SqlSessionHolder holder = (SqlSessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
 
+    // 获取SqlSessionHolder中封装的SqlSession对象
     SqlSession session = sessionHolder(executorType, holder);
     if (session != null) {
       return session;
     }
 
     LOGGER.debug(() -> "Creating a new SqlSession");
+    // 如果SqlSession为空，则通过SqlSessionFactory创建新的SqlSession对象
     session = sessionFactory.openSession(executorType);
 
+    // 将SqlSession对象与Spring事务管理器绑定
     registerSessionHolder(sessionFactory, executorType, exceptionTranslator, session);
 
     return session;
@@ -115,7 +119,7 @@ public final class SqlSessionUtils {
    * Note: The DataSource used by the Environment should be synchronized with the transaction either through
    * DataSourceTxMgr or another tx synchronization. Further assume that if an exception is thrown, whatever started the
    * transaction will handle closing / rolling back the Connection associated with the SqlSession.
-   * 
+   *
    * @param sessionFactory
    *          sqlSessionFactory used for registration.
    * @param executorType
