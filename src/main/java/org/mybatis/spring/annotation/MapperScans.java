@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The Container annotation that aggregates several {@link MapperScan} annotations.
+ * The Container annotation that aggregates(合集) several {@link MapperScan} annotations.
  *
  * <p>
  * Can be used natively, declaring several nested {@link MapperScan} annotations. Can also be used in conjunction with

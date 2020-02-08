@@ -49,11 +49,13 @@ import org.springframework.util.StringUtils;
  * @see ClassPathMapperScanner
  * @since 1.2.0
  */
+// ImportBeanDefinitionRegistrar接口只有一个方法，在使用中通常是重写该方法，在方法中注册对应Bean的信息
+// ResourceLoaderAware是一个标记接口，用于通过ApplicationContext上下文注入ResourceLoader
 public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @deprecated Since 2.0.2, this method not used never.
    */
   @Override
@@ -136,7 +138,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
 
   /**
    * A {@link MapperScannerRegistrar} for {@link MapperScans}.
-   * 
+   *
    * @since 2.0.0
    */
   static class RepeatingRegistrar extends MapperScannerRegistrar {

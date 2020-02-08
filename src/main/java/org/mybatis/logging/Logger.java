@@ -24,6 +24,7 @@ import java.util.function.Supplier;
  *
  * @author Putthiphong Boonphong
  */
+// 封装org.apache.ibatis.logging.Log
 public class Logger {
 
   private final Log log;

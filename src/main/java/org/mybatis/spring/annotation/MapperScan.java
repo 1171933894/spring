@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
  * <p>
  * Configuration example:
  * </p>
- * 
+ *
  * <pre class="code">
  * &#064;Configuration
  * &#064;MapperScan("org.mybatis.spring.sample.mapper")
@@ -70,6 +70,12 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+/**
+ * 注意@Import，可以使用以下三种方式之一注册bean:
+ * 1）@Import(MyConfiguration.class)，导入一个配置类,这里MyConfiguration使用了@Configuration注解,由Spring专门用于bean定义
+ * 2）导入某个ImportSelector接口实现类，@Import(MyImportSelector.class)
+ * 3）导入某个ImportBeanDefinitionRegistrar接口实现类，@Import(MyBeanDefinitionRegistrar.class)
+ */
 @Import(MapperScannerRegistrar.class)
 @Repeatable(MapperScans.class)
 public @interface MapperScan {
@@ -160,7 +166,7 @@ public @interface MapperScan {
    * <p>
    * Default is {@code false}.
    * </p>
-   * 
+   *
    * @return set {@code true} to enable lazy initialization
    * @since 2.0.2
    */
