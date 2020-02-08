@@ -178,13 +178,15 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-    //
+    // 遍历basePackages中指定的所有包，扫描包下的Java文件并进行解析。使用之前注册的过滤器
+    // 进行过滤，得到符合条件的BeanDefinitionHolder对象
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
       LOGGER.warn(() -> "No MyBatis mapper was found in '" + Arrays.toString(basePackages)
           + "' package. Please check your configuration.");
     } else {
+      // 处理扫描得到的BeanDefinitionHolder集合
       processBeanDefinitions(beanDefinitions);
     }
 
@@ -201,9 +203,11 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
+      // 将扫描到的接口类型作为构造方法的参数
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      // 将BeanDefinition中记录的Bean类型修改为MapperFactoryBean
       definition.setBeanClass(this.mapperFactoryBeanClass);
-
+      // 修改自动注入方式
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 
       boolean explicitFactoryUsed = false;
