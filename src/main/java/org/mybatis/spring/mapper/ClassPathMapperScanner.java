@@ -117,12 +117,14 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     boolean acceptAllInterfaces = true;
 
     // if specified, use the given annotation and / or marker interface
+    // 对于 annotationClass 属性的处理
     if (this.annotationClass != null) {
       addIncludeFilter(new AnnotationTypeFilter(this.annotationClass));
       acceptAllInterfaces = false;
     }
 
     // override AssignableTypeFilter to ignore matches on the actual marker interface
+    // 对于 markerlnterface 属性的处理
     if (this.markerInterface != null) {
       addIncludeFilter(new AssignableTypeFilter(this.markerInterface) {
         @Override
@@ -144,6 +146,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     }
 
     // exclude package-info.java
+    // 不扫描 packageInfo.java 文件
     addExcludeFilter(new TypeFilter() {
       @Override
       public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
@@ -164,6 +167,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
+      // 如果没有扫描到任何文件发出警告
       logger.warn("No MyBatis mapper was found in '" + Arrays.toString(basePackages) + "' package. Please check your configuration.");
     } else {
       // 处理扫描得到的BeanDefinitionHolder集合，将集合中的每一个mapper接口转换成MapperFactory
