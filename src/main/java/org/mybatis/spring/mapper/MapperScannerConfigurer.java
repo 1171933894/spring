@@ -299,6 +299,26 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
    */
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+    /**
+     * BeanDefinitionRegistries 会在应用启动的时候调用，并且会早于 BeanFactoryPostProcessors 的调
+     * 用，这就让 PropertyResourceConfigurers 还没有被加载所有对于属性文件的引用将会失效
+     * 为避免此种情况发生，此方法手动地找出定义的 PropertyResourceConfigurers 并进行提前调用
+     * 以保证对于属性的引用可以正常工作
+     *
+     * 如要创建配置文件如 test.property 并添加属性对 basePaekage=test.mybatis.dao 后在 spring 配置文件中加入属性文件解析器：
+     * <bean mesHand er lass rg.Springframework.beans.faetory.ConfigPropertyPlaeeholderConfigurer” >
+     *  <property name=” loeations” >
+     *    <list>
+     *      <value>config/test.properties</value>
+     *    </list>
+     *  </property>
+     * </bean>
+     * 修改 MapperScannerConfigurer 型的 bean 定义:
+     * <bear elass org mybatis Spring .mapper . MapperSeannerConfi gurer” >
+     *  <property name=” ba s ePaekage value test mybatis da ／〉
+     *  <property name=” proeessPropertyPlaeeHolders " value=” true ” />
+     * </bean>
+     */
     if (this.processPropertyPlaceHolders) {// 占位符处理
       processPropertyPlaceHolders();
     }

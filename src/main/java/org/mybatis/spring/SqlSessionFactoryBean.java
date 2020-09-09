@@ -547,6 +547,9 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
   /**
    * {@inheritDoc}
    */
+  /**
+   * 由于 SqlSessionFactoryBean 实现了 FactoryBean 接口，所以当通过  getBean 方法获取对应实例时，其实是获取该类的 getObject（）函数返回的实例
+   */
   @Override
   public SqlSessionFactory getObject() throws Exception {
     if (this.sqlSessionFactory == null) {

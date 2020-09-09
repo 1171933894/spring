@@ -124,7 +124,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     }
 
     // override AssignableTypeFilter to ignore matches on the actual marker interface
-    // 对于 markerlnterface 属性的处理
+    // 对于 markerInterface 属性的处理
     if (this.markerInterface != null) {
       addIncludeFilter(new AssignableTypeFilter(this.markerInterface) {
         @Override
@@ -163,7 +163,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-    // 通过父类的扫描，获取所有复合条件的BeanDefinitionHolder对象
+    // 通过父类的扫描，获取所有符合条件的BeanDefinitionHolder对象
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
@@ -190,7 +190,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(definition.getBeanClassName()); // issue #59
-      definition.setBeanClass(this.mapperFactoryBean.getClass());
+      definition.setBeanClass(this.mapperFactoryBean.getClass());// 开始构造 MapperFactoryBean 类型的 bean
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 

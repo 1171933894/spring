@@ -70,13 +70,24 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
    */
   @Override
   protected void checkDaoConfig() {
+    // 1、父类中对 sqlSession 不为空的验证
+    /**
+     * 也就是说，对于下面的配置如果忽略了对于 sqlSessionFactory 属性的设置，那么在此时
+     * 会被检测出
+     * <bean id=”userMapper” class=”org.mybatis.Spring.mapper.MapperFactoryBean”>
+     *  <property name="mapperInterface" value="test.mybatis.dao.UserMapper"></property>
+     *  <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+     * </b ean>
+     */
     super.checkDaoConfig();
 
     notNull(this.mapperInterface, "Property 'mapperInterface' is required");
 
+    // 2、映射接口的验证
     Configuration configuration = getSqlSession().getConfiguration();
     if (this.addToConfig && !configuration.hasMapper(this.mapperInterface)) {
       try {
+        // 3、映射文件存在性验证
         configuration.addMapper(this.mapperInterface);
       } catch (Exception e) {
         logger.error("Error while adding the mapper '" + this.mapperInterface + "' to configuration.", e);
