@@ -68,6 +68,9 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
  * SqlSessionTemplate对象完成指定的数据库操作。线程安全，可以
  * 在DAO之间共享使用，其底层封装了Spring管理的SqlSession对象。
  *
+ * 【重要】使用该类进行解决了DefaultSqlSession的线程安全与IOC
+ *       容器单例的问题
+ *
  * @author Putthiphong Boonphong
  * @author Hunter Presnall
  * @author Eduardo Macarron

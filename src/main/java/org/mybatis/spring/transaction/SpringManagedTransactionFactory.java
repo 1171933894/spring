@@ -31,6 +31,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
  */
 public class SpringManagedTransactionFactory implements TransactionFactory {
 
+  // 问题：事务时间是那么设置的？
   /**
    * {@inheritDoc}
    */

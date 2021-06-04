@@ -28,13 +28,18 @@ import org.springframework.dao.support.DaoSupport;
  * <p>
  * This class needs a SqlSessionTemplate or a SqlSessionFactory. If both are set the SqlSessionFactory will be ignored.
  * <p>
- * 
+ *
  * @author Putthiphong Boonphong
  * @author Eduardo Macarron
  *
  * @see #setSqlSessionFactory
  * @see #setSqlSessionTemplate
  * @see SqlSessionTemplate
+ */
+
+/**
+ * SqlSessionDaoSupport是一个实现了DaoSupport接口的抽象类，其主要功能是
+ * 辅助开发人员编写DAO层实现。但实现该类就需要DAO层有Impl类了，有点不太方便！！！
  */
 public abstract class SqlSessionDaoSupport extends DaoSupport {
 
@@ -59,7 +64,7 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
    * <p>
    * Can be overridden in subclasses to provide a SqlSessionTemplate instance with different configuration, or a custom
    * SqlSessionTemplate subclass.
-   * 
+   *
    * @param sqlSessionFactory
    *          the MyBatis SqlSessionFactory to create a SqlSessionTemplate for
    * @return the new SqlSessionTemplate instance
