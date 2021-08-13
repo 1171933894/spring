@@ -87,7 +87,7 @@ public class MapperScannerBeanDefinitionParser implements BeanDefinitionParser {
     scanner.registerFilters();
     String basePackage = element.getAttribute(ATTRIBUTE_BASE_PACKAGE);
     scanner.scan(StringUtils.tokenizeToStringArray(basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
-    return null;
+    return null;// 注意：这里返回的是null
   }
 
 }

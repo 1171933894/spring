@@ -163,7 +163,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-    // 通过父类的扫描，获取所有符合条件的BeanDefinitionHolder对象
+    // 注意：父类的super.doScan(basePackages)已经将BeanDefinition全部注册了
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
