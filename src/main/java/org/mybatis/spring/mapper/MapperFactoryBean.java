@@ -72,12 +72,11 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
   protected void checkDaoConfig() {
     // 1、父类中对 sqlSession 不为空的验证
     /**
-     * 也就是说，对于下面的配置如果忽略了对于 sqlSessionFactory 属性的设置，那么在此时
-     * 会被检测出
+     * 也就是说，对于下面的配置如果忽略了对于 sqlSessionFactory 属性的设置，那么在此时会被检测出
      * <bean id=”userMapper” class=”org.mybatis.Spring.mapper.MapperFactoryBean”>
      *  <property name="mapperInterface" value="test.mybatis.dao.UserMapper"></property>
      *  <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
-     * </b ean>
+     * </bean>
      */
     super.checkDaoConfig();
 

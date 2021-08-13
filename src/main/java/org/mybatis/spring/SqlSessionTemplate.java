@@ -80,8 +80,10 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
 
   private final ExecutorType executorType;
 
+  // 通过 JDK 动态代理生成的代理对象
   private final SqlSession sqlSessionProxy;
 
+  // 异常转换器，不做重点描述
   private final PersistenceExceptionTranslator exceptionTranslator;
 
   /**
@@ -132,6 +134,7 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
     this.sqlSessionFactory = sqlSessionFactory;
     this.executorType = executorType;
     this.exceptionTranslator = exceptionTranslator;
+    // 通过 JDK 动态代理的方式，创建 SqlSession 类型的代理对象，并初始化 sqlSessionProxy 字段
     this.sqlSessionProxy = (SqlSession) newProxyInstance(
         SqlSessionFactory.class.getClassLoader(),
         new Class[] { SqlSession.class },
@@ -416,7 +419,7 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
   //This method forces spring disposer to avoid call of SqlSessionTemplate.close() which gives UnsupportedOperationException
   }
 
-    /**
+  /**
    * Proxy needed to route MyBatis method calls to the proper SqlSession got
    * from Spring's Transaction Manager
    * It also unwraps exceptions thrown by {@code Method#invoke(Object, Object...)} to
@@ -425,18 +428,24 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
   private class SqlSessionInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      // 通过静态方法 SqlSessionUtils#getSession 获取 SqlSession 对象
+      /**
+       * 首先尝试从 Spring 事务管理器中获取 SqlSession 对象，如果获取成功则直接返回，否则通过 SqlSessionFactory 新建 SqlSession 对象井将其交由 Spring 事务管理器管理后返回
+       */
       SqlSession sqlSession = getSqlSession(
           SqlSessionTemplate.this.sqlSessionFactory,
           SqlSessionTemplate.this.executorType,
           SqlSessionTemplate.this.exceptionTranslator);
       try {
+        // 调用 SqlSession 对象的相应方法
         Object result = method.invoke(sqlSession, args);
+        // 检测事务是否由 Spring 进行管理，并据此决定是否提交事务（注意这里的!）
         if (!isSqlSessionTransactional(sqlSession, SqlSessionTemplate.this.sqlSessionFactory)) {
           // force commit even on non-dirty sessions because some databases require
           // a commit/rollback before calling close()
           sqlSession.commit(true);
         }
-        return result;
+        return result;// 返回数据库操作的相应结果
       } catch (Throwable t) {
         Throwable unwrapped = unwrapThrowable(t);
         if (SqlSessionTemplate.this.exceptionTranslator != null && unwrapped instanceof PersistenceException) {

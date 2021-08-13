@@ -38,6 +38,22 @@ import org.springframework.dao.support.DaoSupport;
  * @see #setSqlSessionTemplate
  * @see SqlSessionTemplate
  */
+
+/**
+ * SqlSessionDaoSupport 是一个实现了 Dao Support 接口的抽象类，其主要功能是辅助开发人员编写 DAO 层实现
+ *
+ * eg示例：
+ * public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
+   * public User getUser (String userid) {
+     * return (User) getSqlSess on() .selectOne (” com . x ] m.mapper.UserMapper .getUser”,
+     * userid) ;
+   * }
+ * }
+ * UserDaoImpl在applicationContext.xml文件中相应的配置：
+ * <bean id=”userMapper” class=”XXXX.XXXX.UserDaoImpl” >
+ *     <property name=”sqlSessionFactory” ref=”sqlSessionFactory” />
+ * </bean>
+ */
 public abstract class SqlSessionDaoSupport extends DaoSupport {
 
   private SqlSession sqlSession;

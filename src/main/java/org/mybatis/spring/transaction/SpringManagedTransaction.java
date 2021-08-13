@@ -79,8 +79,16 @@ public class SpringManagedTransaction implements Transaction {
    * so we need to no-op that calls.
    */
   private void openConnection() throws SQLException {
+    // Spring 事务管理器中获取数据库连接对象，实际上，首先尝试从事务上下文中获取数据库连接，如果
+    // 获取成功则返回该连接，否则从数据源获取数据库连接并返回
+    // 底层是通过基于 TransactionSynchronizationManager#getResource 静态方法实现的，在
+    // applicationContext.xml 中配置的事务管理器 DataSourceTransactionManager 中，也是通
+    // 过该静态方法获取事务对象，并完成开启/关闭事务功能的
     this.connection = DataSourceUtils.getConnection(this.dataSource);
+    // 记录事务是否自动提交，当使用 Spring 来管理事务时，并不会由 SpringManagedTransaction 的
+    // commit() 和 rollback() 两个方法来管理事务
     this.autoCommit = this.connection.getAutoCommit();
+    // 记录当前连接是否由 Spring 事务管理器管理
     this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
 
     if (LOGGER.isDebugEnabled()) {
@@ -102,6 +110,7 @@ public class SpringManagedTransaction implements Transaction {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Committing JDBC Connection [" + this.connection + "]");
       }
+      // 当事务不由 Spring 事务管理器管理，且不需要自动提交时，则在此处真正提交事务
       this.connection.commit();
     }
   }
@@ -115,6 +124,7 @@ public class SpringManagedTransaction implements Transaction {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Rolling back JDBC Connection [" + this.connection + "]");
       }
+      // 当事务不由 Spring 事务管理器管理，且不需要自动提交时，则在此处真正提交事务
       this.connection.rollback();
     }
   }
@@ -124,6 +134,7 @@ public class SpringManagedTransaction implements Transaction {
    */
   @Override
   public void close() throws SQLException {
+    // 将数据库连接归还给 Spring 事务管理器
     DataSourceUtils.releaseConnection(this.connection, this.dataSource);
   }
     

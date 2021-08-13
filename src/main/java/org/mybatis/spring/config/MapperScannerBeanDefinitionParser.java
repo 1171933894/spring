@@ -42,7 +42,6 @@ import org.w3c.dom.Element;
  */
 
 public class MapperScannerBeanDefinitionParser implements BeanDefinitionParser {
-
   private static final String ATTRIBUTE_BASE_PACKAGE = "base-package";
   private static final String ATTRIBUTE_ANNOTATION = "annotation";
   private static final String ATTRIBUTE_MARKER_INTERFACE = "marker-interface";
@@ -53,6 +52,7 @@ public class MapperScannerBeanDefinitionParser implements BeanDefinitionParser {
   /**
    * {@inheritDoc}
    */
+
   @Override
   public synchronized BeanDefinition parse(Element element, ParserContext parserContext) {
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(parserContext.getRegistry());
